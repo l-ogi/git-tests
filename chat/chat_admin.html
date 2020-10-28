@@ -1,0 +1,100 @@
+<script src="https://www.gstatic.com/firebasejs/7.21.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.21.1/firebase-database.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBenf7CzZ_AH85htZf_a-yjujjwEVBpL9o",
+    authDomain: "test-11d99.firebaseapp.com",
+    databaseURL: "https://test-11d99.firebaseio.com",
+    projectId: "test-11d99",
+    storageBucket: "test-11d99.appspot.com",
+    messagingSenderId: "314905512266",
+    appId: "1:314905512266:web:661a55620efd4cfe7bd9b3"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+
+  var myName = prompt('Enter your name');
+  function sendMessage() {
+      var message = document.getElementById('message').value;
+      //names.push(myName)
+      firebase.database().ref('messages').push().set({
+         'sender': myName,
+         'message': message
+      })
+      return false;
+  }
+
+  firebase.database().ref("messages").on("child_added", function (snapshot) {
+            var html = ''
+              if(snapshot.val().sender == myName){
+                html += "<br><a style='float: right;box-shadow: -5px 6px 4px 0 black;' id='message-"+ snapshot.key +"'>";
+                html += snapshot.val().message + " .";
+                html +="<button style='background: gray;box-shadow: -5px 6px 4px 0 black;border: none;' ' data-id='" + snapshot.key + "' onclick='deleteM(this);'>delete</button>"
+                html += "<button style='background: gray;box-shadow: -5px 6px 4px 0 black;border: none;' data='" + snapshot.key + "' onclick='deleteAll();'>all</button>"
+
+              } else html += "<br><a style='box-shadow: -5px 6px 4px 0 black;' id='message-"+ snapshot.key +"'>",
+                     html +="<button style='background: gray;box-shadow: -5px 6px 4px 0 black;border: none;' data-id='" + snapshot.key + "' onclick='deleteM(this);'>delete</button>",
+                     html += ' ' + snapshot.val().sender + " ~ " +  snapshot.val().message;
+            html += "</a>";
+               document.getElementById("messages").innerHTML += html;
+  })
+
+  function deleteM(self) {
+    var messageId = self.getAttribute("data-id");
+    firebase.database().ref("messages").child(messageId).remove()
+  }
+
+  function deleteAll() {
+      firebase.database().ref("messages").remove()
+  }
+
+  firebase.database().ref("messages").on("child_removed", function (snapshot) {
+    document.getElementById("message-" + snapshot.key).innerHTML = ''
+  })
+
+  // =================================================================
+  // var baseFile = []
+  // var  fR = new FileReader()
+  // function  onChange (){
+  //     const files = document.getElementById("sel").target.files[0]
+  //     //const files = event.target.files[0]
+      
+  //     this.fR.onload = () => {
+  //       this.baseFile.push(this.fR.result.toString())
+  //       console.log(files)
+  //     }
+      
+  //     this.fR.readAsDataURL(files)
+  // }
+</script>
+<div style="width: 400px; height: 100%;
+ background: radial-gradient(black, transparent); color: whitesmoke;">
+    <ul id="messages"></ul>
+    <br>
+    <form style="margin-left: 7rem; width: 100%;" onsubmit='return sendMessage()'>
+       <input style="box-shadow: -5px 6px 4px 0 black;
+                     border: none;
+                     background: gray;
+                     width: 72%;
+                     color: whitesmoke;
+                    "         
+       id='message'
+       placeholder='Enter message' 
+       autocomplete='off'><br><br>
+       
+       <button style="width: 90%;
+                      margin-left: -90px;
+                      height: 1.3rem;
+                      box-shadow: -5px 6px 4px 0 black;
+                      border-radius: 44%;
+                      background: gray;
+                      border: none;
+                      outline: none;
+                      " type='submit'>send</button>
+    </form>
+</div>
+<!-- <img src="https://drive.google.com/file/d/1zqUccgRMvgNvYap_63vOOPJM-S5OGhMT/view?usp=drivesdk"> -->
+
+
